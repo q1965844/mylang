@@ -14,7 +14,7 @@ namespace MyLang
     class SimpleTokenizer : ITokenizer
     {
         static Regex NumberPattern = new Regex(@"^\d+$");
-        static Regex SpacePattern = new Regex(@"\data+");
+        static Regex SpacePattern = new Regex(@"\s+");
         public SimpleTokenizer()
         {
 

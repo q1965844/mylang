@@ -51,7 +51,7 @@ namespace MyLang
         public IList<Token> Tokenize(string src)
         {
             var String_split= regexSpace.Split(src);
-            return String_split.Select(x => TokenMatch(x)).Concat(new[] { new Token(TokenType.Terminate, "[EOS]") }).ToArray();
+            return String_split.Select(x => TokenMatch(x)).Concat(new[] { new Token(TokenType.Terminate, "[EOF]") }).ToArray();
         }
     }
 }

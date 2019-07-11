@@ -52,7 +52,7 @@ class Program
         }
 
         // 各実行器を用意する
-        ITokenizer tokenizer = new SpaceSeparatedTokenizer();
+        ITokenizer tokenizer = new SimpleTokenizer();
         var parser = new Parser();
         var interpreter = new Interpreter();
 

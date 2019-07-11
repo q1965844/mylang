@@ -13,31 +13,45 @@ namespace MyLang
     /// </summary>
     class SpaceSeparatedTokenizer : ITokenizer
     {
-        static Regex regexNumber = new Regex(@"^\d$");
+        static Regex regexNumber = new Regex(@"^\d+$");
         static Regex regexSpace = new Regex(@"\s+");
-
         public SpaceSeparatedTokenizer()
         {
 
         }
 
-        Token match(string s)
+        Token TokenMatch(string s)
         {
-            return new Token(TokenType.Number, "1")); ;
+            switch (s)
+            {
+                case "+":
+                    return new Token(TokenType.Plus, s);
+                    
+                case "-":
+                    return new Token(TokenType.Minus, s);
+                    
+                case "*":
+                    return new Token(TokenType.Star, s);
+                    
+                case "/":
+                    return new Token(TokenType.Slash, s);
+                    
+                default:
+                    if (regexNumber.IsMatch(s))
+                    {
+                        return new Token(TokenType.Number, s);
+                    }
+                    else
+                    {
+                        return new Token(TokenType.Terminate, "!!no this token!!");
+                    }
+            }
         }
 
         public IList<Token> Tokenize(string src)
         {
-            var tokenString = regexSpace.Split(src);
-            return tokenString.Select(x =>match(x));
-            // TODO: 仮のダミー実装
-            var dummy = new List<Token>();
-            dummy.Add(new Token(TokenType.Number, "1"));
-            dummy.Add(new Token(TokenType.Plus, "+"));
-            dummy.Add(new Token(TokenType.Number, "2"));
-            dummy.Add(new Token(TokenType.Terminate, "[EOF]"));
-            return dummy;
+            var String_split= regexSpace.Split(src);
+            return String_split.Select(x => TokenMatch(x)).Concat(new[] { new Token(TokenType.Terminate, "[EOS]") }).ToArray();
         }
-
     }
 }

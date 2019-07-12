@@ -46,13 +46,85 @@ namespace MyLang
         {
             tokens_ = tokens;
             pos_ = 0;
-
-            // TODO: 仮のダミー実装
-            var lhs = new Ast.Number(1);
-            var rhs = new Ast.Number(2);
-            var ast = new Ast.BinOp(Ast.BinOpType.Add, lhs, rhs);
-
-            return ast;
+            return Start();
         }
+
+        Ast.Exp Start()
+        {
+            
+            var lhs = parseMultiply();
+            if (parseMultiply() == null)
+            {
+                return null;
+            }
+            return parseAdd(lhs);
+        }
+
+        Ast.Exp parseMultiply()
+        {
+            var lhs = parseNumber();
+            if (lhs == null)
+            {
+                return null;
+            }
+            return MultiplyCombine(lhs);
+         }
+
+        Ast.Exp MultiplyCombine(Ast.Exp lhs)
+        {
+            var b = currentToken();
+            if (b.Type == TokenType.Star || b.Type == TokenType.Slash)
+            {
+                var binopType = BinOpMap[b.Type];
+                progress();
+                var rhs = parseNumber();
+                if (rhs == null)
+                {
+                    throw new Exception("NO rhs");
+                }
+                var exp =new Ast.BinOp(binopType, lhs, rhs);
+                return MultiplyCombine(exp);
+            }
+            else
+            {
+                return lhs;
+            }
+        }
+
+        Ast.Exp parseAdd(Ast.Exp lhs)
+        {
+            var b = currentToken();
+            if (b.Type == TokenType.Plus || b.Type == TokenType.Minus)
+            {
+                var binopType = BinOpMap[b.Type];
+                progress();
+                var rhs = parseMultiply();
+                if (rhs == null)
+                {
+                    throw new Exception("NO rhs");
+                }
+                var exp = new Ast.BinOp(binopType, lhs, rhs);
+                return parseAdd(exp);
+            }
+            else
+            {
+                return lhs;
+            }
+        }
+
+        Ast.Exp parseNumber()
+        {
+            var n = currentToken();
+            if (n.IsNumber)
+            {
+                progress();
+                return new Ast.Number(float.Parse(n.Text));
+            }
+            else
+            {
+                return null;
+            }
+        }
+
     }
 }

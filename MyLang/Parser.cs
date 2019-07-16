@@ -42,83 +42,82 @@ namespace MyLang
             pos_++;
         }
 
+        
+
         public Ast.Ast Parse(IList<Token> tokens)
         {
             tokens_ = tokens;
             pos_ = 0;
-            return Start();
+            return start();
         }
 
-        Ast.Exp Start()
+        //parser start
+        Ast.Exp start()
         {
-            
-            var lhs = parseMultiply();
-            if (parseMultiply() == null)
+            var left = p_multiply(p_value());
+            return p_add(left);
+        }
+
+        //parser "+" & "-"
+        // BNF: expr ->   expr (+ | - ) term | term
+        //
+        //  expr ::= term  ( (+ | - ) expr  )...
+        Ast.Exp p_add(Ast.Exp left)
+        {
+            if (left == null)
             {
                 return null;
             }
-            return parseAdd(lhs);
+            var m = currentToken();
+            if (m.Type == TokenType.Plus || m.Type == TokenType.Minus)
+            {
+                progress();
+                var right = p_multiply(p_value());
+                if (right == null)
+                {
+                    throw new Exception("no  right");
+                }
+                var exp = new Ast.BinOp(BinOpMap[m.Type], left, right);
+                return p_add(exp);
+            }
+            else
+            {
+                return left;
+            }
         }
 
-        Ast.Exp parseMultiply()
+        //parser "*" & "/"
+        Ast.Exp p_multiply(Ast.Exp left)
         {
-            var lhs = parseNumber();
-            if (lhs == null)
+            if (left == null)
             {
                 return null;
             }
-            return MultiplyCombine(lhs);
-         }
-
-        Ast.Exp MultiplyCombine(Ast.Exp lhs)
-        {
-            var b = currentToken();
-            if (b.Type == TokenType.Star || b.Type == TokenType.Slash)
+            var m = currentToken();
+            if (m.Type == TokenType.Star || m.Type == TokenType.Slash)
             {
-                var binopType = BinOpMap[b.Type];
                 progress();
-                var rhs = parseNumber();
-                if (rhs == null)
+                var right = p_multiply(p_value());
+                if (right == null)
                 {
-                    throw new Exception("NO rhs");
+                    throw new Exception("no  right");
                 }
-                var exp =new Ast.BinOp(binopType, lhs, rhs);
-                return MultiplyCombine(exp);
+                var exp = new Ast.BinOp(BinOpMap[m.Type], left, right);
+                return p_multiply(exp);
             }
             else
             {
-                return lhs;
+                return left;
             }
         }
 
-        Ast.Exp parseAdd(Ast.Exp lhs)
+        Ast.Exp p_value()
         {
-            var b = currentToken();
-            if (b.Type == TokenType.Plus || b.Type == TokenType.Minus)
-            {
-                var binopType = BinOpMap[b.Type];
-                progress();
-                var rhs = parseMultiply();
-                if (rhs == null)
-                {
-                    throw new Exception("NO rhs");
-                }
-                var exp = new Ast.BinOp(binopType, lhs, rhs);
-                return parseAdd(exp);
-            }
-            else
-            {
-                return lhs;
-            }
-        }
-
-        Ast.Exp parseNumber()
-        {
-            var n = currentToken();
-            if (n.IsNumber)
+            var t = currentToken();
+            if (t.IsNumber)
             {
                 progress();
-                return new Ast.Number(float.Parse(n.Text));
+                return new Ast.Number(float.Parse(t.Text));
             }
             else
             {

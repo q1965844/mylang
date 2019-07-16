@@ -38,11 +38,9 @@ namespace MyLang
         /// </summary>
         void progress()
         {
-            Logger.Trace($"progress {currentToken().Text}");
+            //Logger.Trace($"progress {currentToken().Text}");
             pos_++;
         }
-
-        
 
         public Ast.Ast Parse(IList<Token> tokens)
         {
@@ -54,6 +52,7 @@ namespace MyLang
         //parser start
         Ast.Exp start()
         {
+            //Logger.Trace("start()");
             var left = p_multiply(p_value());
             return p_add(left);
         }
@@ -61,9 +60,10 @@ namespace MyLang
         //parser "+" & "-"
         // BNF: expr ->   expr (+ | - ) term | term
         //
-        //  expr ::= term  ( (+ | - ) expr  )...
+        //  expr ::= term  ( (+ | - ) term  )...
         Ast.Exp p_add(Ast.Exp left)
         {
+            //Logger.Trace("p_add()");
             if (left == null)
             {
                 return null;
@@ -87,8 +87,13 @@ namespace MyLang
         }
 
         //parser "*" & "/"
+        //
+        // term->term x factor|term/factor|factor
+        // 
+        // term ->   factor ( (*|/) factor  )...
         Ast.Exp p_multiply(Ast.Exp left)
         {
+            //Logger.Trace("p_multiply()");
             if (left == null)
             {
                 return null;
@@ -97,7 +102,7 @@ namespace MyLang
             if (m.Type == TokenType.Star || m.Type == TokenType.Slash)
             {
                 progress();
-                var right = p_multiply(p_value());
+                var right = p_value();
                 if (right == null)
                 {
                     throw new Exception("no  right");
@@ -111,8 +116,10 @@ namespace MyLang
             }
         }
 
+        //parser Number
         Ast.Exp p_value()
         {
+            //Logger.Trace("p_value()");
             var t = currentToken();
             if (t.IsNumber)
             {
@@ -127,3 +134,22 @@ namespace MyLang
 
     }
 }
+
+#if false
+
+// Javascript 
+function add(a,b)
+{
+  return a + b;
+}
+
+// Language C
+
+// Function definition
+int add(int a, int b) {
+  return a + b;
+}
+
+int add;   // Variable definition 
+
+#endif

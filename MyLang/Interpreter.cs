@@ -13,28 +13,30 @@ namespace MyLang
 
         public float Run(Ast.Ast ast)
         {
-            return calculate((Exp)ast);
+            Exp exp = (Exp)ast;
+            return sum(exp);
         }
 
-        float calculate(Exp exp)
+        public float sum(Exp exp)
         {
             if (exp is BinOp)
             {
-                var bin = (BinOp)exp;
-                var lValue = calculate(bin.Lhs);
-                var rValue = calculate(bin.Rhs);
-                switch (bin.Operator)
+                var exp_b = (BinOp)exp;
+                var exp_teyp = exp_b.Operator;
+                var left = sum(exp_b.Lhs);
+                var right = sum(exp_b.Rhs);
+                switch (exp_teyp)
                 {
                     case BinOpType.Add:
-                        return lValue + rValue;
+                        return left + right;
                     case BinOpType.Sub:
-                        return lValue - rValue;
+                        return left - right;
                     case BinOpType.Multiply:
-                        return lValue * rValue;
+                        return left * right;
                     case BinOpType.Divide:
-                        return lValue / rValue;
+                        return left / right;
                     default:
-                        throw new Exception("bug");
+                        throw new Exception("error");
                 }
             }
             else if (exp is Number)
@@ -44,7 +46,7 @@ namespace MyLang
             }
             else
             {
-                throw new Exception("bug");
+                throw new Exception("error");
             }
         }
     }

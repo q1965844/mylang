@@ -16,8 +16,8 @@ namespace MyLang
 
         public float Run(Ast.Ast ast)
         {
-            Interprete(ast);
-            return 0;
+            
+            return Interprete(ast);
 
 
         }
@@ -33,17 +33,17 @@ namespace MyLang
                 switch (b.statiment)
                 {
                     case Keyword.let:
-                        var b_id = b.id;
+                        var b_id = (Variable)b.id;
                         var b_num = (Number)b.exp;
                         for (int i = 0; i < 5; i++)
                         {
-                            if (name.ContainsKey(b_id.ToString()))
+                            if (name.ContainsKey(b_id.Str))
                             {
                                 break;
                             }
                             else
                             {
-                                name.Add(String.Format("{0}", b_id, b_num.Value), i);
+                                name.Add(String.Format("{0}", b_id.Str, b_num.Value), b_num.Value);
                             }
 
                         }
@@ -95,8 +95,9 @@ namespace MyLang
             {
                 var va = (Variable)exp;
                 float f;
-                if (name.TryGetValue(va.Str, out f))
+                if (name.ContainsKey(va.Str))
                 {
+                    name.TryGetValue(va.Str, out f);
                     return f;
                 }
                 else

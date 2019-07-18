@@ -26,17 +26,32 @@ namespace MyLang
         /// 式(Expression) のベースクラス
         /// </summary>
         public abstract class Exp : Ast { }
-
+        public abstract class Stat : Ast { }
         /// <summary>
         /// ２項演算子の種類
         /// </summary>
         public enum BinOpType
-        {
+        { 
             Add, // +
             Sub, // -
             Multiply, // *
             Divide, // /
         }
+
+        public enum SymbolType
+        {
+            equal,
+
+        }
+        public enum Keyword
+        {
+            let,
+            print,
+            function,
+            return_,
+        }
+
+        #region Expression //式
 
         /// <summary>
         /// 二項演算子(Binary Operator)を表すAST
@@ -75,6 +90,66 @@ namespace MyLang
                 return Tuple.Create(Value.ToString(), (Ast[])null);
             }
         }
+
+        public class Variable : Exp
+        {
+            public readonly string Str;
+            public Variable(string value)
+            {
+                Str = value;
+            }
+
+            public override Tuple<string, Ast[]> GetDisplayInfo()
+            {
+                return Tuple.Create(Str, (Ast[])null);
+            }
+        }
+        #endregion
+
+        public class Baselist : Ast
+        {
+            public readonly List<Ast> Base;
+            public Baselist(List<Ast> _base)
+            {
+                Base = _base;
+            }
+
+            public override Tuple<string, Ast[]> GetDisplayInfo()
+            {
+                return Tuple.Create("Baselist", Base.ToArray());
+            }
+        }
+
+        public class Base : Stat
+        {
+            public readonly Keyword statiment;
+            public readonly Exp id;
+            public readonly Exp exp;
+            public Base(Keyword _stat,Exp _id,Exp _exp)
+            {
+                statiment = _stat;
+                id = _id;
+                exp = _exp;
+            }
+            public Base(Keyword _stat,Exp _exp)
+            {
+                statiment = _stat;
+                exp = _exp;
+            }
+            public override Tuple<string, Ast[]> GetDisplayInfo()
+            {
+                if (id != null)
+                {
+                    return Tuple.Create(statiment.ToString(), new Ast[] { id, exp });
+                }
+                else
+                {
+                    return Tuple.Create(statiment.ToString(), new Ast[] { exp });
+                }
+            }
+        }
+
+        #region 文字列表現
 
         /// <summary>
         /// ASTを文字列表現に変換するクラス
@@ -141,6 +216,7 @@ namespace MyLang
                 list_.Add(Tuple.Create(level, text));
             }
         }
+        #endregion
     }
 
 }

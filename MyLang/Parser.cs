@@ -19,9 +19,21 @@ namespace MyLang
             {TokenType.Slash, Ast.BinOpType.Divide },
         };
 
+        static Dictionary<TokenType, Ast.SymbolType> SymbolType = new Dictionary<TokenType, Ast.SymbolType>
+        {
+            {TokenType.Assign, Ast.SymbolType.equal },
+        };
+
+        static Dictionary<TokenType, Ast.Keyword> KeywordType = new Dictionary<TokenType, Ast.Keyword>
+        {
+            {TokenType.Let, Ast.Keyword.let },
+            {TokenType.Function, Ast.Keyword.function },
+            {TokenType.Return, Ast.Keyword.return_ },
+            {TokenType.Print, Ast.Keyword.print },
+        };
+
         public Parser()
         {
-
         }
 
         /// <summary>
@@ -38,32 +50,87 @@ namespace MyLang
         /// </summary>
         void progress()
         {
-            //Logger.Trace($"progress {currentToken().Text}");
             pos_++;
         }
 
+        void match(TokenType s)
+        {
+            var t = currentToken();
+            if (t.Type == s)
+                progress();
+            else
+                throw new Exception("match fail!!");
+        }
+    
         public Ast.Ast Parse(IList<Token> tokens)
         {
             tokens_ = tokens;
             pos_ = 0;
-            return start();
+            return Baselist();
+        }
+
+        Ast.Baselist Baselist()
+        {
+            List<Ast.Ast> baselist = new List<Ast.Ast>();
+
+            while (currentToken().Text != "[EOF]")
+            {
+                if (currentToken().Text != "[EOF]")
+                {
+                    baselist.Add(Base());
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return new Ast.Baselist(baselist);
+        }
+
+        Ast.Stat Base()
+        {
+            var c = currentToken();
+            var cType = c.Type;
+            var cKeyWork = KeywordType[cType];
+            switch (cType)
+            {
+                case TokenType.Let:
+                    progress();
+                    var id = start();
+                    match(TokenType.Assign);
+                    var num = start();
+                    match(TokenType.Semicolon);
+                    return new Ast.Base(cKeyWork,id, num);
+                case TokenType.Print:
+                    progress();
+                    var value = start();
+                    match(TokenType.Semicolon);
+                    return new Ast.Base(cKeyWork,value);
+                case TokenType.Return:
+                    progress();
+                    var exp = start();
+                    match(TokenType.Semicolon);
+                    return new Ast.Base(cKeyWork, exp);
+                case TokenType.Function:
+                    throw new Exception("Function fail!!");
+                default:
+                    throw new Exception("Base fail!!");
+            }
+
         }
 
         //parser start
         Ast.Exp start()
         {
-            //Logger.Trace("start()");
             var left = p_multiply(p_value());
             return p_add(left);
         }
-
         //parser "+" & "-"
         // BNF: expr ->   expr (+ | - ) term | term
         //
         //  expr ::= term  ( (+ | - ) term  )...
         Ast.Exp p_add(Ast.Exp left)
         {
-            //Logger.Trace("p_add()");
             if (left == null)
             {
                 return null;
@@ -93,7 +160,6 @@ namespace MyLang
         // term ->   factor ( (*|/) factor  )...
         Ast.Exp p_multiply(Ast.Exp left)
         {
-            //Logger.Trace("p_multiply()");
             if (left == null)
             {
                 return null;
@@ -119,16 +185,20 @@ namespace MyLang
         //parser Number
         Ast.Exp p_value()
         {
-            //Logger.Trace("p_value()");
             var t = currentToken();
             if (t.IsNumber)
             {
                 progress();
                 return new Ast.Number(float.Parse(t.Text));
             }
+            else if (t.IsVariable)
+            {
+                progress();
+                return new Ast.Variable(t.Text);
+            }
             else
             {
-                return null;
+                throw new Exception("p_value BUG");
             }
         }
 

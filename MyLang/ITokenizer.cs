@@ -11,15 +11,27 @@ namespace MyLang
     /// </summary>
     public enum TokenType
     {
-        Terminate, // ソースの終わりを表す
-
-        Number, // 数値
-        Symbol, // 識別子
-
         Plus, // "+"
         Minus, // "-"
         Star, // "*"
         Slash, // "/"
+
+        Semicolon, // ";"
+        leftParen,  // "("
+        RightParen, // ")"
+
+
+        Number, // 数値
+        Symbol, // 識別子 "<,>, : , ; "
+        Variable,// 变数
+        Assign, // "="
+
+        Let,
+        Print,
+        Return,
+        Function,
+
+        Terminate, // ソースの終わりを表す
     }
 
     /// <summary>
@@ -35,10 +47,12 @@ namespace MyLang
             Type = type;
             Text = text;
         }
-        
+
         public bool IsTerminate => (Type == TokenType.Terminate);
         public bool IsNumber => (Type == TokenType.Number);
+        public bool IsVariable => (Type == TokenType.Variable);
         public bool IsSymbol => (Type == TokenType.Symbol);
+        public bool IsAssign => (Type == TokenType.Assign);
         public bool IsBinaryOperator => (Type == TokenType.Plus || Type == TokenType.Minus || Type == TokenType.Star || Type == TokenType.Slash);
     }
 

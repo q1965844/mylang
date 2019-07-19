@@ -49,6 +49,7 @@ namespace MyLang
             print,
             function,
             return_,
+            variable,
         }
 
         #region Expression //式
@@ -125,6 +126,7 @@ namespace MyLang
             public readonly Keyword statiment;
             public readonly Exp id;
             public readonly Exp exp;
+            public readonly Stat function;
             public Base(Keyword _stat,Exp _id,Exp _exp)
             {
                 statiment = _stat;
@@ -136,11 +138,21 @@ namespace MyLang
                 statiment = _stat;
                 exp = _exp;
             }
+            public Base(Keyword _stat,Stat _function)
+            {
+                statiment = _stat;
+                function = _function;
+            }
             public override Tuple<string, Ast[]> GetDisplayInfo()
             {
                 if (id != null)
-                {
+                {   
+                    
                     return Tuple.Create(statiment.ToString(), new Ast[] { id, exp });
+                }
+                else if(function != null)
+                {
+                    return Tuple.Create(statiment.ToString(), new Ast[] { function });
                 }
                 else
                 {

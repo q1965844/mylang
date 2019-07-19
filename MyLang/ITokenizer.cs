@@ -9,27 +9,33 @@ namespace MyLang
     /// <summary>
     /// トークンの種類
     /// </summary>
-    public enum TokenType
+    public enum TokenType 
     {
-        Plus, // "+"
-        Minus, // "-"
-        Star, // "*"
-        Slash, // "/"
+        Plus,   // "+"
+        Minus,  // "-"
+        Star,   // "*"
+        Slash,  // "/"
 
-        Semicolon, // ";"
-        leftParen,  // "("
+        Assign,     // "="
+        Semicolon,  // ";"
+        LeftParen,  // "("
         RightParen, // ")"
+        LeftBrace,  // "{"
+        RightBrace, // "}"
+        Comma,      // ","
 
-
-        Number, // 数値
-        Symbol, // 識別子 "<,>, : , ; "
+        Number,  // 数値
+        Symbol,  // 識別子 "<,>, : "
         Variable,// 变数
-        Assign, // "="
 
-        Let,
-        Print,
-        Return,
-        Function,
+        Let,         // "let"
+        Print,       // "print"
+        Return,      // "return"
+        Function,    // "function"
+        Double_slash,   // '//'
+        Slash_star,     // '/*'
+        Star_slash,     // '*/'
+
 
         Terminate, // ソースの終わりを表す
     }

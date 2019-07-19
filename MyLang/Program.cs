@@ -66,7 +66,7 @@ class Program
         }
 
         // Parse を行う
-        var ast = parser.Parse(tokens);
+        var ast = parser.Parse_Start(tokens);
 
         if( parseOnly)
         {

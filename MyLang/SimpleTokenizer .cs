@@ -24,12 +24,22 @@ namespace MyLang
             { "-",TokenType.Minus},
             { "*",TokenType.Star},
             { "/",TokenType.Slash},
+
             { "=",TokenType.Assign},
+            { ";",TokenType.Semicolon},
+            { "(",TokenType.LeftParen},
+            { ")",TokenType.RightParen},
+            { "{",TokenType.LeftBrace},
+            { "}",TokenType.RightBrace},
+            { ",",TokenType.Comma},
+
             { "let",TokenType.Let},
             { "return",TokenType.Return},
             { "print",TokenType.Print},
-            { "Function",TokenType.Function},
-            { ";",TokenType.Semicolon},
+            { "function",TokenType.Function},
+            { "//",TokenType.Double_slash},
+            { "/*",TokenType.Slash_star},
+            { "*/",TokenType.Star_slash},
         };
 
         public SimpleTokenizer()
@@ -42,7 +52,7 @@ namespace MyLang
             return Reader(src).Concat(new[] { new Token(TokenType.Terminate, "[EOF]") }).ToList();
         }
 
-        List<Token> Reader(string str)
+        public List<Token> Reader(string str)
         {
             var currPos = 0;
             var dataLenght = str.Length;
@@ -51,72 +61,94 @@ namespace MyLang
             while (currPos < dataLenght)
             {
                 var data = str.Substring(currPos, 1);
-                TokenType tt;
                 if (SpacePattern.IsMatch(data))
                 {
                     currPos++;
                 }
-                else if (TokenMatch.TryGetValue(data, out tt)) //Single Symbol
+                else if (TokenMatch.ContainsKey(data))      //Single Symbol
                 {
-                    fin_Token.Add(new Token(tt, data));
+                    fin_Token.Add(new Token(TokenMatch[data], data));
                     currPos++;
                 }
                 else if (NumberPattern.IsMatch(data))        //Number
                 {
-                    while (NumberPattern.IsMatch(data))
-                    {
-                        currToken += data;
-                        currPos++;
-                        if (currPos >= dataLenght || !NumberPattern.IsMatch(data))
-                        {
-                            break;
-                        }
-                        data = str.Substring(currPos, 1);
-                    }
-                    fin_Token.Add(new Token(TokenType.Number, currToken));
-                    currToken = "";
+                    Match_Number(data);
                 }
                 else if (SymbolPattern.IsMatch(data))        //Multi-Symbol
                 {
-                    while (SymbolPattern.IsMatch(data))
-                    {
-                        currToken += data;
-                        currPos++;
-                        if (currPos >= dataLenght || !SymbolPattern.IsMatch(data))
-                        {
-                            break;
-                        }
-                        data = str.Substring(currPos, 1);
-                    }
-                    fin_Token.Add(new Token(TokenType.Symbol, currToken));
-                    currToken = "";
+                    Match_MultiSymbol(data);
                 }
                 else if (VariablePattern.IsMatch(data))        //Variable
                 {
-                    while (VariablePattern.IsMatch(data))
-                    {
-                        currToken += data;
-                        currPos++;
-                        if (currPos >= dataLenght || !VariablePattern.IsMatch(data))
-                        {
-                            break;
-                        }
-                        data = str.Substring(currPos, 1);
-                    }
-                    if (TokenMatch.TryGetValue(currToken, out tt))
-                        fin_Token.Add(new Token(tt, currToken));
-                    else
-                        fin_Token.Add(new Token(TokenType.Variable, currToken));
-                    currToken = "";
+                    Match_Variable(data);
                 }
                 else
                 {
-                    throw new Exception("no token tyep");
+                    throw new Exception("no tokentyep");
                 }
-
             }
+            #region All Match void
+            
+            void Match_Number(string data)
+            {
+                while (NumberPattern.IsMatch(data))
+                {
+                    currToken += data;
+                    currPos++; 
+                    if (currPos >= dataLenght || !NumberPattern.IsMatch(data))
+                    {
+                        break;
+                    }
+                    data = str.Substring(currPos, 1);
+                }
+                fin_Token.Add(new Token(TokenType.Number, currToken));
+                currToken = "";
+            }
+
+            void Match_MultiSymbol(string data)
+            {
+                TokenType tt;
+                while (SymbolPattern.IsMatch(data))
+                {
+                    currToken += data;
+                    currPos++;
+                    if (currPos >= dataLenght || !SymbolPattern.IsMatch(data))
+                    {
+                        break;
+                    }
+                    data = str.Substring(currPos, 1);
+                }
+                if (TokenMatch.TryGetValue(currToken, out tt))
+                    fin_Token.Add(new Token(tt, currToken));
+                else
+                    fin_Token.Add(new Token(TokenType.Symbol, currToken));
+                currToken = "";
+            }
+
+            void Match_Variable(string data)
+            {
+                TokenType tt;
+                while (VariablePattern.IsMatch(data))
+                {
+                    currToken += data;
+                    currPos++;
+                    if (currPos >= dataLenght || !VariablePattern.IsMatch(data))
+                    {
+                        break;
+                    }
+                    data = str.Substring(currPos, 1);
+                }
+                if (TokenMatch.TryGetValue(currToken, out tt))
+                    fin_Token.Add(new Token(tt, currToken));
+                else
+                    fin_Token.Add(new Token(TokenType.Variable, currToken));
+                currToken = "";
+            }
+            #endregion
             return fin_Token;
         }
+
+        
     }
 }
 

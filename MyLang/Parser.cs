@@ -19,14 +19,10 @@ namespace MyLang
             {TokenType.Slash, Ast.BinOpType.Divide },
         };
 
-        static Dictionary<TokenType, Ast.SymbolType> SymbolType = new Dictionary<TokenType, Ast.SymbolType>
-        {
-            {TokenType.Assign, Ast.SymbolType.equal },
-        };
-
         static Dictionary<TokenType, Ast.Keyword> KeywordType = new Dictionary<TokenType, Ast.Keyword>
         {
             {TokenType.Let, Ast.Keyword.let },
+            {TokenType.Variable, Ast.Keyword.variable },
             {TokenType.Function, Ast.Keyword.function },
             {TokenType.Return, Ast.Keyword.return_ },
             {TokenType.Print, Ast.Keyword.print },
@@ -53,16 +49,22 @@ namespace MyLang
             pos_++;
         }
 
-        void match(TokenType s)
+        bool match(TokenType s)
         {
             var t = currentToken();
             if (t.Type == s)
+            {
                 progress();
+                return true;
+            }
             else
-                throw new Exception("match fail!!");
+            {
+                return false;
+                //throw new Exception("match error");
+            }
         }
     
-        public Ast.Ast Parse(IList<Token> tokens)
+        public Ast.Ast Parse_Start(IList<Token> tokens)
         {
             tokens_ = tokens;
             pos_ = 0;
@@ -101,6 +103,15 @@ namespace MyLang
                     var num = start();
                     match(TokenType.Semicolon);
                     return new Ast.Base(cKeyWork,id, num);
+                case TokenType.Variable:
+                    var id2 = start();
+                    if (match(TokenType.Assign))
+                    {
+                        var num2 = start();
+                        match(TokenType.Semicolon);
+                        return new Ast.Base(cKeyWork, id2, num2);
+                    }
+                    return new Ast.Base(cKeyWork,id2);
                 case TokenType.Print:
                     progress();
                     var value = start();
@@ -112,13 +123,27 @@ namespace MyLang
                     match(TokenType.Semicolon);
                     return new Ast.Base(cKeyWork, exp);
                 case TokenType.Function:
-                    throw new Exception("Function fail!!");
+                    progress();
+                    var title = start();
+                    if (match(TokenType.LeftParen))
+                    {
+                        Base();
+                        while (match(TokenType.Comma))
+                        {
+                            Base();
+                        }
+                        match(TokenType.RightParen);
+                    }
+                    match(TokenType.LeftBrace);
+                    var b = Base();
+                    match(TokenType.RightBrace);
+                    return new Ast.Base(cKeyWork, b);
                 default:
                     throw new Exception("Base fail!!");
             }
 
         }
-
+        #region EXP Parser
         //parser start
         Ast.Exp start()
         {
@@ -201,7 +226,7 @@ namespace MyLang
                 throw new Exception("p_value BUG");
             }
         }
-
+        #endregion
     }
 }
 

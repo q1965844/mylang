@@ -124,35 +124,40 @@ namespace MyLang
         public class Base : Stat
         {
             public readonly Keyword statiment;
+            public readonly string function_name;
             public readonly Exp id;
             public readonly Exp exp;
             public readonly Stat function;
+            public readonly Exp f_name;
+            public readonly Baselist bl;
+            public Base(Keyword _stat, Baselist _bl, Stat _function)
+            {
+                statiment = _stat;
+                bl = _bl;
+                function = _function;
+            }
             public Base(Keyword _stat,Exp _id,Exp _exp)
             {
                 statiment = _stat;
                 id = _id;
                 exp = _exp;
             }
+
             public Base(Keyword _stat,Exp _exp)
             {
                 statiment = _stat;
                 exp = _exp;
             }
-            public Base(Keyword _stat,Stat _function)
-            {
-                statiment = _stat;
-                function = _function;
-            }
             public override Tuple<string, Ast[]> GetDisplayInfo()
             {
-                if (id != null)
+                if (statiment == Keyword.let || (statiment == Keyword.variable && id!=null))
                 {   
                     
                     return Tuple.Create(statiment.ToString(), new Ast[] { id, exp });
                 }
-                else if(function != null)
+                else if(statiment == Keyword.function || statiment == Keyword.print)
                 {
-                    return Tuple.Create(statiment.ToString(), new Ast[] { function });
+                    return Tuple.Create(statiment.ToString(), new Ast[] {bl,function });
                 }
                 else
                 {

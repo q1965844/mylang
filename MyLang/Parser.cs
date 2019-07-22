@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyLang.Ast;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,6 +28,7 @@ namespace MyLang
             {TokenType.Return, Ast.Keyword.return_ },
             {TokenType.Print, Ast.Keyword.print },
         };
+        static Dictionary<string, Ast.Base> function = new Dictionary<string, Ast.Base> { };
 
         public Parser()
         {
@@ -63,7 +65,7 @@ namespace MyLang
                 //throw new Exception("match error");
             }
         }
-    
+
         public Ast.Ast Parse_Start(IList<Token> tokens)
         {
             tokens_ = tokens;
@@ -102,7 +104,7 @@ namespace MyLang
                     match(TokenType.Assign);
                     var num = start();
                     match(TokenType.Semicolon);
-                    return new Ast.Base(cKeyWork,id, num);
+                    return new Ast.Base(cKeyWork, id, num);
                 case TokenType.Variable:
                     var id2 = start();
                     if (match(TokenType.Assign))
@@ -111,38 +113,64 @@ namespace MyLang
                         match(TokenType.Semicolon);
                         return new Ast.Base(cKeyWork, id2, num2);
                     }
-                    return new Ast.Base(cKeyWork,id2);
+                    return new Ast.Base(cKeyWork, id2);
                 case TokenType.Print:
                     progress();
-                    var value = start();
+                    var value = (Variable)start();
+                    List<Ast.Ast> list2 = new List<Ast.Ast>();
+                    var bb2 = new Baselist(list2);
+                    if (function.ContainsKey(value.Str))
+                    {
+                        match(TokenType.LeftParen);
+                        var fun = function[value.Str];
+                        var cont = 0;
+                        bb2.Base.Add(new Ast.Base(Keyword.variable, (Exp)fun.bl.Base[cont], start()));
+                        while (match(TokenType.Comma))
+                        {
+                            cont++;
+                            bb2.Base.Add(new Ast.Base(Keyword.variable, (Exp)fun.bl.Base[cont], start()));
+                        }
+                        match(TokenType.RightParen);
+                        match(TokenType.Semicolon);
+                        return new Ast.Base(cKeyWork, bb2, fun.function); 
+                    }
                     match(TokenType.Semicolon);
-                    return new Ast.Base(cKeyWork,value);
+                    return new Ast.Base(cKeyWork, value);
                 case TokenType.Return:
                     progress();
                     var exp = start();
                     match(TokenType.Semicolon);
                     return new Ast.Base(cKeyWork, exp);
                 case TokenType.Function:
+                    List<Ast.Ast> list = new List<Ast.Ast>();
+                    var bb = new Baselist(list);
                     progress();
-                    var title = start();
+                    var title = (Variable)start();
                     if (match(TokenType.LeftParen))
                     {
-                        Base();
+                        list.Add(start());
                         while (match(TokenType.Comma))
                         {
-                            Base();
+                            list.Add(start());
                         }
                         match(TokenType.RightParen);
                     }
                     match(TokenType.LeftBrace);
                     var b = Base();
                     match(TokenType.RightBrace);
-                    return new Ast.Base(cKeyWork, b);
+                    function.Add(title.Str, new Ast.Base(cKeyWork, bb, b));
+                    return new Ast.Base(cKeyWork,bb,b);
                 default:
                     throw new Exception("Base fail!!");
             }
 
         }
+
+        public class callback
+        {
+
+        }
+
         #region EXP Parser
         //parser start
         Ast.Exp start()

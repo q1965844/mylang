@@ -13,14 +13,14 @@ namespace MyLang
         }
 
         static Dictionary<string, float> name = new Dictionary<string, float>();
-
         public float Run(Ast.Ast ast)
         {
 
             return Interprete(ast);
 
-
         }
+
+
         public float Interprete(Ast.Ast ast)
         {
             var Blist = (Baselist)ast;
@@ -59,6 +59,10 @@ namespace MyLang
                         {
                             name[b_id2.Str] = sum(b_num2);
                         }
+                        else if (b_num2 == null)
+                        {
+                            name.Add(String.Format("{0}", b_id2.Str), 0);
+                        }
                         else
                         {
                             name.Add(String.Format("{0}", b_id2.Str), sum(b_num2));
@@ -66,9 +70,21 @@ namespace MyLang
                         break;
                     case Keyword.print:
                         var b_exp = b.exp;
-                        ans = sum(b_exp);
+                        var b_fun =b.function;
+                        var bb = b.bl;
+                        var b_id3 = b.id;
+                        if (bb != null)
+                        {
+                            b.bl.Base.ForEach(i => baseInterpreter((Base)i));
+                            baseInterpreter((Base)b.function);
+                        }
+                        else
+                            ans = sum(b_exp);
                         break;
+                            
                     case Keyword.function:
+                        var f_name = b.f_name;
+                        
                         baseInterpreter((Base)b.function);
                         break;
                     case Keyword.return_:
@@ -121,7 +137,8 @@ namespace MyLang
                 }
                 else
                 {
-                    throw new Exception("error");
+                    name.Add(String.Format("{0}", va.Str), 0);
+                    return 0;
                 }
             }
             else

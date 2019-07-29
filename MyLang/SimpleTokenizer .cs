@@ -18,7 +18,7 @@ namespace MyLang
         static Regex VariablePattern = new Regex(@"[A-Za-z_]\w*");
         static Regex SymbolPattern = new Regex(@"\W+");
 
-        static Dictionary<string, TokenType> TokenMatch = new Dictionary<string, TokenType>
+        static Dictionary<string, TokenType> SingleTokenMatch = new Dictionary<string, TokenType>
         {
             { "+",TokenType.Plus},
             { "-",TokenType.Minus},
@@ -32,7 +32,12 @@ namespace MyLang
             { "{",TokenType.LeftBrace},
             { "}",TokenType.RightBrace},
             { ",",TokenType.Comma},
+        };
 
+        static Dictionary<string, TokenType> TokenMatch = new Dictionary<string, TokenType>
+        {
+            { "if",TokenType.If},
+            { "for",TokenType.For},
             { "let",TokenType.Let},
             { "return",TokenType.Return},
             { "print",TokenType.Print},
@@ -40,11 +45,16 @@ namespace MyLang
             { "//",TokenType.Double_slash},
             { "/*",TokenType.Slash_star},
             { "*/",TokenType.Star_slash},
+            { ">",TokenType.Greater},
+            { "<",TokenType.Less},
+            { ">=",TokenType.GreaterEqrequal},
+            { "<=",TokenType.LessEqrequal},
+            { "==",TokenType.Equal},
+
         };
 
         public SimpleTokenizer()
         {
-
         }
 
         public IList<Token> Tokenize(string src)
@@ -61,13 +71,13 @@ namespace MyLang
             while (currPos < dataLenght)
             {
                 var data = str.Substring(currPos, 1);
-                if (SpacePattern.IsMatch(data))
+                if (SpacePattern.IsMatch(data))              //Space
                 {
                     currPos++;
                 }
-                else if (TokenMatch.ContainsKey(data))      //Single Symbol
+                else if (SingleTokenMatch.ContainsKey(data))       //Single Symbol
                 {
-                    fin_Token.Add(new Token(TokenMatch[data], data));
+                    fin_Token.Add(new Token(SingleTokenMatch[data], data));
                     currPos++;
                 }
                 else if (NumberPattern.IsMatch(data))        //Number
@@ -78,7 +88,7 @@ namespace MyLang
                 {
                     Match_MultiSymbol(data);
                 }
-                else if (VariablePattern.IsMatch(data))        //Variable
+                else if (VariablePattern.IsMatch(data))      //Variable
                 {
                     Match_Variable(data);
                 }

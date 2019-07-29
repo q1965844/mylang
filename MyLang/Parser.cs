@@ -70,10 +70,10 @@ namespace MyLang
         {
             tokens_ = tokens;
             pos_ = 0;
-            return Baselist();
+            return BaseList();
         }
 
-        Ast.Baselist Baselist()
+        Ast.BaseList BaseList()
         {
             List<Ast.Ast> baselist = new List<Ast.Ast>();
 
@@ -88,7 +88,7 @@ namespace MyLang
                     break;
                 }
             }
-            return new Ast.Baselist(baselist);
+            return new Ast.BaseList(baselist);
         }
 
         Ast.Stat Base()
@@ -98,6 +98,13 @@ namespace MyLang
             var cKeyWork = KeywordType[cType];
             switch (cType)
             {
+                case TokenType.If:
+                    progress();
+                    if (match(TokenType.LeftParen))
+                    {
+                        
+                    }
+
                 case TokenType.Let:
                     progress();
                     var id = start();
@@ -116,19 +123,20 @@ namespace MyLang
                     return new Ast.Base(cKeyWork, id2);
                 case TokenType.Print:
                     progress();
-                    var value = (Variable)start();
+                    var value = start();
+                    var value_s = (Variable)value;
                     List<Ast.Ast> list2 = new List<Ast.Ast>();
-                    var bb2 = new Baselist(list2);
-                    if (function.ContainsKey(value.Str))
+                    var bb2 = new BaseList(list2);
+                    if (function.ContainsKey(value_s.Str))
                     {
                         match(TokenType.LeftParen);
-                        var fun = function[value.Str];
+                        var fun = function[value_s.Str];
                         var cont = 0;
-                        bb2.Base.Add(new Ast.Base(Keyword.variable, (Exp)fun.bl.Base[cont], start()));
+                        bb2.Baselist.Add(new Ast.Base(Keyword.variable, (Exp)fun.bl.Baselist[cont], start()));
                         while (match(TokenType.Comma))
                         {
                             cont++;
-                            bb2.Base.Add(new Ast.Base(Keyword.variable, (Exp)fun.bl.Base[cont], start()));
+                            bb2.Baselist.Add(new Ast.Base(Keyword.variable, (Exp)fun.bl.Baselist[cont], start()));
                         }
                         match(TokenType.RightParen);
                         match(TokenType.Semicolon);
@@ -143,7 +151,7 @@ namespace MyLang
                     return new Ast.Base(cKeyWork, exp);
                 case TokenType.Function:
                     List<Ast.Ast> list = new List<Ast.Ast>();
-                    var bb = new Baselist(list);
+                    var bb = new BaseList(list);
                     progress();
                     var title = (Variable)start();
                     if (match(TokenType.LeftParen))
@@ -165,12 +173,28 @@ namespace MyLang
             }
 
         }
+        #region Comparison
 
-        public class callback
+        Ast.Exp compare()
+        {
+            var a = currentToken();
+            if (a.Type == TokenType.Variable || a.Type == TokenType.Number)
+            {
+                start();
+                var compare_type = currentToken().Type;
+                if (compare_type == TokenType.Greater || compare_type == TokenType.GreaterEqrequal || compare_type == TokenType.Less || compare_type == TokenType.LessEqrequal || compare_type == TokenType.Equal)
+                {
+
+                }
+            }
+        }
+
+        Ast.Exp compare_symbol()
         {
 
         }
 
+        #endregion
         #region EXP Parser
         //parser start
         Ast.Exp start()

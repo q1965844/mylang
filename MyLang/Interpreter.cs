@@ -23,8 +23,8 @@ namespace MyLang
 
         public float Interprete(Ast.Ast ast)
         {
-            var Blist = (Baselist)ast;
-            var baselist = Blist.Base.ToArray();
+            var Blist = (BaseList)ast;
+            var baselist = Blist.Baselist.ToArray();
             var c = 0;
             float ans = 0;
             while (c < baselist.Length)
@@ -75,7 +75,7 @@ namespace MyLang
                         var b_id3 = b.id;
                         if (bb != null)
                         {
-                            b.bl.Base.ForEach(i => baseInterpreter((Base)i));
+                            b.bl.Baselist.ForEach(i => baseInterpreter((Base)i));
                             baseInterpreter((Base)b.function);
                         }
                         else
@@ -83,8 +83,6 @@ namespace MyLang
                         break;
                             
                     case Keyword.function:
-                        var f_name = b.f_name;
-                        
                         baseInterpreter((Base)b.function);
                         break;
                     case Keyword.return_:
@@ -95,7 +93,6 @@ namespace MyLang
                         break;
                 }
             }
-
             return ans;
         }
 

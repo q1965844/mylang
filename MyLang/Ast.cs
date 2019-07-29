@@ -25,26 +25,22 @@ namespace MyLang
         /// <summary>
         /// 式(Expression) のベースクラス
         /// </summary>
-        public abstract class Exp : Ast { }
         public abstract class Stat : Ast { }
+        public abstract class Exp : Stat { }
         /// <summary>
         /// ２項演算子の種類
         /// </summary>
         public enum BinOpType
         { 
-            Add, // +
-            Sub, // -
-            Multiply, // *
-            Divide, // /
+            Add,        // +
+            Sub,        // -
+            Multiply,   // *
+            Divide,     // /
         }
 
-        public enum SymbolType
-        {
-            equal,
-
-        }
         public enum Keyword
         {
+            If,
             let,
             print,
             function,
@@ -107,43 +103,40 @@ namespace MyLang
         }
         #endregion
 
-        public class Baselist : Ast
+        public class BaseList : Ast
         {
-            public readonly List<Ast> Base;
-            public Baselist(List<Ast> _base)
+            public readonly List<Ast> Baselist;
+            public BaseList(List<Ast> _base)
             {
-                Base = _base;
+                Baselist = _base;
             }
 
             public override Tuple<string, Ast[]> GetDisplayInfo()
             {
-                return Tuple.Create("Baselist", Base.ToArray());
+                return Tuple.Create("BaseList", Baselist.ToArray());
             }
         }
 
         public class Base : Stat
         {
             public readonly Keyword statiment;
-            public readonly string function_name;
             public readonly Exp id;
             public readonly Exp exp;
             public readonly Stat function;
-            public readonly Exp f_name;
-            public readonly Baselist bl;
-            public Base(Keyword _stat, Baselist _bl, Stat _function)
+            public readonly BaseList bl;
+            public Base(Keyword _stat, BaseList _bl, Stat _function)    //function init
             {
                 statiment = _stat;
                 bl = _bl;
                 function = _function;
             }
-            public Base(Keyword _stat,Exp _id,Exp _exp)
+            public Base(Keyword _stat,Exp _id,Exp _exp)                 //Variable init
             {
                 statiment = _stat;
                 id = _id;
                 exp = _exp;
             }
-
-            public Base(Keyword _stat,Exp _exp)
+            public Base(Keyword _stat,Exp _exp)                         //Number init
             {
                 statiment = _stat;
                 exp = _exp;
@@ -152,10 +145,9 @@ namespace MyLang
             {
                 if (statiment == Keyword.let || (statiment == Keyword.variable && id!=null))
                 {   
-                    
                     return Tuple.Create(statiment.ToString(), new Ast[] { id, exp });
                 }
-                else if(statiment == Keyword.function || statiment == Keyword.print)
+                else if(statiment == Keyword.function || statiment == Keyword.print && bl!=null)
                 {
                     return Tuple.Create(statiment.ToString(), new Ast[] {bl,function });
                 }

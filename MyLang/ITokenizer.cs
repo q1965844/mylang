@@ -16,26 +16,33 @@ namespace MyLang
         Star,   // "*"
         Slash,  // "/"
 
-        Assign,     // "="
-        Semicolon,  // ";"
-        LeftParen,  // "("
-        RightParen, // ")"
-        LeftBrace,  // "{"
-        RightBrace, // "}"
-        Comma,      // ","
+        Assign,         // "="
+        Semicolon,      // ";"
+        LeftParen,      // "("
+        RightParen,     // ")"
+        LeftBrace,      // "{"
+        RightBrace,     // "}"
+        Comma,          // ","
 
         Number,  // 数値
         Symbol,  // 識別子 "<,>, : "
         Variable,// 变数
 
+        If,          // "if"
+        For,         // "for"
         Let,         // "let"
         Print,       // "print"
         Return,      // "return"
         Function,    // "function"
+
         Double_slash,   // '//'
         Slash_star,     // '/*'
         Star_slash,     // '*/'
-
+        Greater,        // ">"
+        Less,           // "<"
+        GreaterEqrequal,// ">="
+        LessEqrequal,   // "<="
+        Equal,          // "=="
 
         Terminate, // ソースの終わりを表す
     }
